@@ -26,8 +26,7 @@ import net.runelite.client.ui.overlay.OverlayManager;
 @PluginDescriptor(
         name = "Custom XP Globes",
         description = "Runtime XP globes overlay with FORCE/BLACKLIST modes",
-        tags = {"experience", "levels", "overlay", "custom"},
-        enabledByDefault = false
+        tags = {"experience", "levels", "overlay", "custom"}
 )
 @PluginDependency(XpTrackerPlugin.class)
 public class CustomXpGlobesPlugin extends Plugin
@@ -65,17 +64,14 @@ public class CustomXpGlobesPlugin extends Plugin
     @Override
     protected void startUp()
     {
-        System.out.println("[CustomXpGlobes] [startUp] Plugin Startup Initiated");
         overlayManager.add(overlay);
         xpGlobes.clear();
         globeCache = new CustomXpGlobe[Skill.values().length];
-        System.out.println("[CustomXpGlobes] Plugin started, waiting for LOGGED_IN to process skills.");
     }
 
     @Override
     protected void shutDown()
     {
-        System.out.println("[CustomXpGlobes] [shutDown] Plugin Shutdown Initiated");
         overlayManager.remove(overlay);
         resetGlobes();
     }
@@ -84,7 +80,6 @@ public class CustomXpGlobesPlugin extends Plugin
     {
         xpGlobes.clear();
         globeCache = new CustomXpGlobe[Skill.values().length];
-        System.out.println("[CustomXpOrbs] [resetGlobeState] All XP globes have been reset/cleared.");
     }
 
     public enum SkillDisplayMode { NORMAL, FORCE, BLACKLIST }
@@ -142,7 +137,6 @@ public class CustomXpGlobesPlugin extends Plugin
                 if (lastX != -1 && lastY != -1 && (x != lastX || y != lastY))
                 {
                     firstMovementDetected = true;
-                    System.out.println("[CustomXpOrbs] First player movement detected, enabling NORMAL-mode globes.");
                 }
 
                 lastX = x;
@@ -163,18 +157,13 @@ public class CustomXpGlobesPlugin extends Plugin
         CustomXpGlobe cachedGlobe = globeCache[skillIdx];
         boolean isForce = mode == SkillDisplayMode.FORCE;
 
-        System.out.println("[CustomXpOrbs] [onStatChanged] [Stage 1] Received stat change: "
-                + skill.getName() + " | XP=" + currentXp + " | Level=" + currentLevel + " | Mode=" + mode);
-
         if (mode == SkillDisplayMode.BLACKLIST)
         {
-            System.out.println("[CustomXpOrbs] [onStatChanged] [Stage 2] Skipping BLACKLIST-mode skill: " + skill.getName());
             return;
         }
 
         if (mode == SkillDisplayMode.NORMAL && !firstMovementDetected)
         {
-            System.out.println("[CustomXpOrbs] [onStatChanged] [Stage 3] Skipping NORMAL-mode globe until first input: " + skill.getName());
             return;
         }
 
@@ -183,8 +172,6 @@ public class CustomXpGlobesPlugin extends Plugin
             int previousXp = cachedGlobe != null ? cachedGlobe.getCurrentXp() : 0;
             if (currentXp <= previousXp)
             {
-                System.out.println("[CustomXpOrbs] [onStatChanged] [Stage 4] Skipping NORMAL-mode globe, XP did not increase: "
-                        + skill.getName() + " | XP=" + currentXp);
                 return;
             }
         }
@@ -194,7 +181,6 @@ public class CustomXpGlobesPlugin extends Plugin
             case HIDE_MAXED:
                 if (currentLevel >= Experience.MAX_REAL_LEVEL && !isForce)
                 {
-                    System.out.println("[CustomXpOrbs] [onStatChanged] [Stage 5] Maxed skill hidden: " + skill.getName());
                     return;
                 }
                 break;
@@ -202,8 +188,6 @@ public class CustomXpGlobesPlugin extends Plugin
                 if (currentLevel >= Experience.MAX_REAL_LEVEL)
                 {
                     currentLevel = Experience.getLevelForXp(currentXp);
-                    System.out.println("[CustomXpOrbs] [onStatChanged] [Stage 6] Maxed skill showing virtual level: "
-                            + skill.getName() + " | Virtual Level=" + currentLevel);
                 }
                 break;
             default:
@@ -216,9 +200,6 @@ public class CustomXpGlobesPlugin extends Plugin
             cachedGlobe.setCurrentLevel(currentLevel);
             cachedGlobe.setTime(Instant.now());
 
-            System.out.println("[CustomXpOrbs] [onStatChanged] [Stage 7] Updated globe for "
-                    + skill.getName() + ": XP=" + currentXp + ", Level=" + currentLevel);
-
             if (!xpGlobes.contains(cachedGlobe))
                 addXpGlobe(cachedGlobe, isForce);
         }
@@ -227,13 +208,6 @@ public class CustomXpGlobesPlugin extends Plugin
             cachedGlobe = new CustomXpGlobe(skill, currentXp, currentLevel, Instant.now());
             globeCache[skillIdx] = cachedGlobe;
             addXpGlobe(cachedGlobe, isForce);
-
-            System.out.println("[CustomXpOrbs] [onStatChanged] [Stage 8] Created new globe for "
-                    + skill.getName() + ": XP=" + currentXp + ", Level=" + currentLevel);
-        }
-        else
-        {
-            System.out.println("[CustomXpOrbs] [onStatChanged] [Stage 9] Skipped creating globe for skill: " + skill.getName());
         }
     }
 
@@ -251,9 +225,6 @@ public class CustomXpGlobesPlugin extends Plugin
                     .ifPresent(oldest -> {
                         xpGlobes.remove(oldest);
                         globeCache[oldest.getSkill().ordinal()] = null;
-
-                        System.out.println("[CustomXpOrbs] [addXpGlobe] Removed oldest XP globe: "
-                                + oldest.getSkill().getName());
                     });
         }
     }
@@ -268,10 +239,6 @@ public class CustomXpGlobesPlugin extends Plugin
             if (expired)
             {
                 globeCache[globe.getSkill().ordinal()] = null;
-                System.out.println("[CustomXpOrbs] [removeExpiredXpGlobes] [Only Stage] Removed expired XP globe: "
-                        + globe.getSkill().getName()
-                        + " | XP=" + globe.getCurrentXp()
-                        + " | Level=" + globe.getCurrentLevel());
             }
             return expired;
         });
@@ -281,7 +248,6 @@ public class CustomXpGlobesPlugin extends Plugin
     {
         xpGlobes.clear();
         globeCache = new CustomXpGlobe[Skill.values().length];
-        System.out.println("[CustomXpOrbs] [resetGlobeState] [Only Stage] All XP globes have been reset/cleared.");
     }
 
     @Subscribe
@@ -291,27 +257,21 @@ public class CustomXpGlobesPlugin extends Plugin
         {
             loadForceSkillsAtStartup();
             boolean firstLogin = false;
-
-            System.out.println("[CustomXpOrbs] [onGameStateChanged] [Stage 1]  LOGGED_IN processed, FORCE-mode loaded, firstLogin=false");
         }
         else if (event.getGameState() == GameState.LOGIN_SCREEN ||
                 event.getGameState() == GameState.STARTING ||
                 event.getGameState() == GameState.CONNECTION_LOST)
         {
             resetGlobeState();
-            System.out.println("[CustomXpOrbs] [onGameStateChanged] [Stage 2] Cleared all orbs due to state: " + event.getGameState());
         }
     }
 
     private void loadForceSkillsAtStartup()
     {
-        System.out.println("[CustomXpOrbs] [loadForceSkillsAtStartup][Stage 0] Loading FORCE-mode skills at startup...");
 
         for (Skill skill : Skill.values())
         {
             SkillDisplayMode mode = getSkillMode(skill);
-            System.out.println("[CustomXpOrbs] [loadForceSkillsAtStartup] [Stage 1] Checking skill: "
-                    + skill.getName() + " | Mode=" + mode);
 
             if (mode == SkillDisplayMode.FORCE)
             {
@@ -325,23 +285,9 @@ public class CustomXpGlobesPlugin extends Plugin
                     globeCache[idx] = globe;
                     addXpGlobe(globe, true);
 
-                    System.out.println("[CustomXpOrbs] [loadForceSkillsAtStartup] [Stage 2] Created new FORCE-mode globe for "
-                            + skill.getName() + ": XP=" + xp + ", Level=" + level);
                 }
-                else
-                {
-                    System.out.println("[CustomXpOrbs] [loadForceSkillsAtStartup] [Stage 3] Globe already exists for FORCE-mode skill: "
-                            + skill.getName());
-                }
-            }
-            else
-            {
-                System.out.println("[CustomXpOrbs] [loadForceSkillsAtStartup] [Stage 4] Not a FORCE-mode skill, skipping: "
-                        + skill.getName());
             }
         }
-
-        System.out.println("[CustomXpOrbs] [loadForceSkillsAtStartup] [Stage 5] Finished loading FORCE-mode skills at startup.");
     }
 
     private void refreshForceSkills()
@@ -360,8 +306,6 @@ public class CustomXpGlobesPlugin extends Plugin
                 globeCache[idx] = globe;
                 addXpGlobe(globe, true);
 
-                System.out.println("[CustomXpOrbs] [refreshForceSkills] Created new FORCE-mode globe for "
-                        + skill.getName());
             }
         }
     }
