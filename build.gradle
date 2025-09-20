@@ -1,0 +1,40 @@
+plugins {
+    id 'java'
+}
+
+group 'net.runelite.client.plugins.customxpglobes'
+version '1.0.0'
+
+sourceCompatibility = JavaVersion.VERSION_11
+targetCompatibility = JavaVersion.VERSION_11
+
+repositories {
+    mavenCentral()
+    maven {
+        url 'https://repo.runelite.net'
+    }
+}
+
+dependencies {
+    compileOnly 'net.runelite:client:1.11.17'
+    compileOnly 'org.projectlombok:lombok:1.18.30'
+    annotationProcessor 'org.projectlombok:lombok:1.18.30'
+
+    testImplementation 'junit:junit:4.12'
+}
+
+jar {
+    manifest {
+        attributes(
+                'Plugin-Class': 'net.runelite.client.plugins.customxpglobes.CustomXpGlobesPlugin'
+        )
+    }
+    from('src/main/resources') {
+        include 'runelite-plugin.properties'
+    }
+}
+
+// Top-level duplicates strategy for all JAR tasks
+tasks.withType(Jar) {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
