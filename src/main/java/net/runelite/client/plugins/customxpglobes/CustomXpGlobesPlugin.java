@@ -67,6 +67,7 @@ public class CustomXpGlobesPlugin extends Plugin
         overlayManager.add(overlay);
         xpGlobes.clear();
         globeCache = new CustomXpGlobe[Skill.values().length];
+        loadForceSkillsAtStartup();
     }
 
     @Override
@@ -320,3 +321,4 @@ public class CustomXpGlobesPlugin extends Plugin
         refreshForceSkills();
     }
 }
+
