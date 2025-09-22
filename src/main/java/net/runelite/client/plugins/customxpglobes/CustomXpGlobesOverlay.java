@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.customxporbs;
+package net.runelite.client.plugins.customxpglobes;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -453,3 +453,4 @@ public class CustomXpGlobesOverlay extends Overlay
         tooltipManager.add(this.xpTooltip);
     }
 }
+
