@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.customxporbs;
+package net.runelite.client.plugins.customxpglobes;
 
 import java.awt.Color;
 import net.runelite.client.config .Alpha;
@@ -566,4 +566,5 @@ public interface CustomXpGlobesConfig extends Config
     @ConfigItem(keyName = "woodcuttingPriority", name = "Woodcutting Priority", description = "Priority for Woodcutting orb (1-23)", position = 86, section = orbPriority)
     @Range(min = 1, max = 23)
     default int woodcuttingPriority() { return 22; }
+
 }
