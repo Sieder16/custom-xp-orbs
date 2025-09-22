@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.customxporbs;
+package net.runelite.client.plugins.customxpglobes;
 
 import java.awt.image.BufferedImage;
 import java.time.Instant;
@@ -27,3 +27,4 @@ class CustomXpGlobe
 	}
 
 }
+
