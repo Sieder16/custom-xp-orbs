@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.customxpglobes;
+package net.runelite.client.plugins.customxporbs;
 
 import java.awt.image.BufferedImage;
 import java.time.Instant;
@@ -16,12 +16,14 @@ class CustomXpGlobe
 	private Instant time;
 	private int size;
     private transient BufferedImage skillIcon;
+    private int cachedPriority;
 
-	CustomXpGlobe(Skill skill, int currentXp, int currentLevel, Instant time)
+    CustomXpGlobe(Skill skill, int currentXp, int currentLevel, Instant time)
 	{
 		this.skill = skill;
 		this.currentXp = currentXp;
 		this.currentLevel = currentLevel;
 		this.time = time;
 	}
+
 }

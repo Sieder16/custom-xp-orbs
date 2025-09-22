@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.customxpglobes;
+package net.runelite.client.plugins.customxporbs;
 
 import java.awt.Color;
 import net.runelite.client.config .Alpha;
@@ -51,28 +51,6 @@ public interface CustomXpGlobesConfig extends Config
     }
 
     @ConfigItem(
-            keyName = "showSkillLevel",
-            name = "Level Display",
-            description = "Enables the level value display inside the orb",
-            position = 3,
-            section = onScreenOrbs
-    )
-    default boolean showSkillLevel() {
-        return false;
-    }
-
-    @ConfigItem(
-            keyName = "enableSkillLevelColour",
-            name = "Level Color Match",
-            description = "Matches The Display Level To The Skill Colour",
-            position = 4,
-            section = onScreenOrbs
-    )
-    default boolean enableSkillLevelColour() {
-        return false;
-    }
-
-    @ConfigItem(
             keyName = "alignOrbsVertically",
             name = "Vertical orbs",
             description = "Aligns the orbs vertically instead of horizontally.",
@@ -82,6 +60,15 @@ public interface CustomXpGlobesConfig extends Config
     default boolean alignOrbsVertically() {
         return false;
     }
+
+    @ConfigItem(
+            keyName = "forceOrbs",
+            name = "Force Orbs before normal orbs",
+            description = "If enabled, Forced XP globes display before normal orbs",
+            position = 6,
+            section = onScreenOrbs
+    )
+    default boolean forceOrbs() { return false; }
 
     enum MaxedSkillDisplay {
         NORMAL,           // Show all skills including 99
@@ -93,7 +80,7 @@ public interface CustomXpGlobesConfig extends Config
             keyName = "maxedSkillDisplay",
             name = "Maxed Skill Display",
             description = "Controls how maxed skills are displayed in XP globes",
-            position = 6,
+            position = 7,
             section = onScreenOrbs
     )
     default MaxedSkillDisplay maxedSkillDisplay() {
@@ -104,7 +91,7 @@ public interface CustomXpGlobesConfig extends Config
             keyName = "Orb duration",
             name = "Duration of orbs",
             description = "Change the duration the XP orbs are visible.",
-            position = 7,
+            position = 8,
             section = onScreenOrbs
     )
     @Units(Units.SECONDS)
@@ -117,7 +104,7 @@ public interface CustomXpGlobesConfig extends Config
     @ConfigSection(
             name = "Customize Orbs",
             description = "Settings for Customizing Orbs",
-            position = 10,
+            position = 9,
             closedByDefault = true
     )
     String customizeOrbs = "Customize Orbs";
@@ -126,7 +113,7 @@ public interface CustomXpGlobesConfig extends Config
             keyName = "enableCustomArcColor",
             name = "Enable custom arc color",
             description = "Enables the custom coloring of the globe's arc instead of using the skill's default color.",
-            position = 11,
+            position = 10,
             section = customizeOrbs
     )
     default boolean enableCustomArcColor() {
@@ -138,7 +125,7 @@ public interface CustomXpGlobesConfig extends Config
             keyName = "Progress arc color",
             name = "Progress arc color",
             description = "Change the color of the progress arc in the XP orb.",
-            position = 12,
+            position = 11,
             section = customizeOrbs
     )
     default Color progressArcColor() {
@@ -150,7 +137,7 @@ public interface CustomXpGlobesConfig extends Config
             keyName = "Progress orb outline color",
             name = "Progress orb outline color",
             description = "Change the color of the progress orb outline.",
-            position = 13,
+            position = 12,
             section = customizeOrbs
     )
     default Color progressOrbOutLineColor() {
@@ -162,7 +149,7 @@ public interface CustomXpGlobesConfig extends Config
             keyName = "Progress orb background color",
             name = "Progress orb background color",
             description = "Change the color of the progress orb background.",
-            position = 14,
+            position = 13,
             section = customizeOrbs
     )
     default Color progressOrbBackgroundColor() {
@@ -173,7 +160,7 @@ public interface CustomXpGlobesConfig extends Config
             keyName = "Progress arc width",
             name = "Progress arc width",
             description = "Change the stroke width of the progress arc.",
-            position = 15,
+            position = 14,
             section = customizeOrbs
     )
     @Units(Units.PIXELS)
@@ -185,7 +172,7 @@ public interface CustomXpGlobesConfig extends Config
             keyName = "Orb size",
             name = "Size of orbs",
             description = "Change the size of the XP orbs.",
-            position = 16,
+            position = 15,
             section = customizeOrbs
     )
     @Units(Units.PIXELS)
@@ -193,78 +180,184 @@ public interface CustomXpGlobesConfig extends Config
         return 40;
     }
 
+    @ConfigItem(
+            keyName = "showSkillLevel",
+            name = "Enable Level Display",
+            description = "Show or hide the skill level inside XP orbs",
+            position = 16,
+            section = customizeOrbs
+    )
+    default boolean showSkillLevel() {
+        return true;
+    }
+
+    @ConfigItem(
+            keyName = "useCustomLevelColor",
+            name = "Custom Level Color",
+            description = "If enabled, uses the configured level color; otherwise uses the skill color",
+            position = 17,
+            section = customizeOrbs
+    )
+    default boolean useCustomLevelColor() {
+        return false;
+    }
+
+    @Alpha
+    @ConfigItem(
+            keyName = "levelArcColor",
+            name = "Level arc color",
+            description = "Color of the skill level text inside the orb",
+            position = 18,
+            section = customizeOrbs
+    )
+    default Color levelArcColor() {
+        return Color.YELLOW;
+    }
+
+    @Alpha
+    @ConfigItem(
+            keyName = "levelBorderColor",
+            name = "Level border color",
+            description = "Color of the border around the skill level text",
+            position = 19,
+            section = customizeOrbs
+    )
+    default Color levelBorderColor() {
+        return Color.BLACK;
+    }
+
+    @ConfigItem(
+            keyName = "levelBorderWidth",
+            name = "Level border width",
+            description = "Width of the border around the skill level text",
+            position = 20,
+            section = customizeOrbs
+    )
+    default int levelBorderWidth() {
+        return 1;
+    }
+
+    @Range(min = -100, max = 100) // allows -100 to +100
+    @ConfigItem(
+            keyName = "iconVerticalOffset",
+            name = "Icon Vertical Offset",
+            description = "Move the skill icon up (positive) or down (negative) inside the orb (pixels).",
+            position = 21,
+            section = customizeOrbs
+    )
+    default int iconVerticalOffset() {
+        return 6;
+    }
+
+    @Range(min = -100, max = 100) // allows -100 to +100
+    @ConfigItem(
+            keyName = "levelVerticalOffset",
+            name = "Level Vertical Offset",
+            description = "Move the skill level text up (positive) or down (negative) inside the orb (pixels).",
+            position = 22,
+            section = customizeOrbs
+    )
+    default int levelVerticalOffset() {
+        return -12;
+    }
+
     /* ---------------- Orb Tooltips ---------------- */
     @ConfigSection(
             name = "Orb Tooltips",
             description = "Settings for Orb Tooltips",
-            position = 20,
+            position = 30,
             closedByDefault = true
     )
     String orbTooltips = "Orb Tooltips";
+
+    public enum TooltipLine
+    {
+        CURRENT_TOTAL_XP("Current Total XP"),
+        XP_LEFT_FOR_LEVEL("XP Left For Level"),
+        ACTIONS_LEFT_BEFORE_LEVEL("Actions Left Before Level"),
+        XP_PER_HOUR("XP Per Hour"),
+        TIME_TILL_LEVEL("Time Till Level");
+
+        private final String displayName;
+
+        TooltipLine(String displayName)
+        {
+            this.displayName = displayName;
+        }
+
+        @Override
+        public String toString()
+        {
+            return displayName;
+        }
+    }
 
     @ConfigItem(
             keyName = "enableTooltips",
             name = "Enable tooltips",
             description = "Configures whether or not to show tooltips.",
-            position = 21,
+            position = 31,
             section = orbTooltips
     )
     default boolean enableTooltips() {
         return true;
-    }  // Tooltips 1
+    }
 
+    // Tooltip line dropdowns
     @ConfigItem(
-            keyName = "showXpLeft",
-            name = "Show XP left",
-            description = "Shows XP left inside the globe tooltip box.",
-            position = 22,
+            keyName = "tooltipLine1",
+            name = "Line 1",
+            description = "Select the first line of the tooltip",
+            position = 32,
             section = orbTooltips
     )
-    default boolean showXpLeft() {
-        return true;
+    default TooltipLine tooltipLine1() {
+        return TooltipLine.CURRENT_TOTAL_XP;
     }
 
     @ConfigItem(
-            keyName = "showActionsLeft",
-            name = "Show actions left",
-            description = "Shows the number of actions left inside the globe tooltip box.",
-            position = 23,
+            keyName = "tooltipLine2",
+            name = "Line 2",
+            description = "Select the second line of the tooltip",
+            position = 33,
             section = orbTooltips
     )
-    default boolean showActionsLeft() {
-        return true;
+    default TooltipLine tooltipLine2() {
+        return TooltipLine.XP_LEFT_FOR_LEVEL;
     }
 
     @ConfigItem(
-            keyName = "showXpHour",
-            name = "Show XP/hr",
-            description = "Shows XP per hour inside the globe tooltip box.",
-            position = 24,
+            keyName = "tooltipLine3",
+            name = "Line 3",
+            description = "Select the third line of the tooltip",
+            position = 34,
             section = orbTooltips
     )
-    default boolean showXpHour() {
-        return true;
+    default TooltipLine tooltipLine3() {
+        return TooltipLine.ACTIONS_LEFT_BEFORE_LEVEL;
     }
 
     @ConfigItem(
-            keyName = "showTimeTilGoal",
-            name = "Show time til goal",
-            description = "Shows the amount of time until goal level in the globe tooltip box.",
-            position = 25,
+            keyName = "tooltipLine4",
+            name = "Line 4",
+            description = "Select the fourth line of the tooltip",
+            position = 35,
             section = orbTooltips
     )
-    default boolean showTimeTilGoal() {
-        return true;
+    default TooltipLine tooltipLine4() {
+        return TooltipLine.XP_PER_HOUR;
     }
 
-    /* ---------------- Per Orb Display Settings ---------------- */
-    @ConfigSection(
-            name = "Per Orb Display Settings",
-            description = "Switch between Normal, Forced & Blacklist Modes",
-            position = 40,
-            closedByDefault = true
+    @ConfigItem(
+            keyName = "tooltipLine5",
+            name = "Line 5",
+            description = "Select the fifth line of the tooltip",
+            position = 36,
+            section = orbTooltips
     )
-    String orbSection = "Per Orb Display Settings";
+    default TooltipLine tooltipLine5() {
+        return TooltipLine.TIME_TILL_LEVEL;
+    }
 
     enum SkillDisplayMode
     {
@@ -273,74 +366,204 @@ public interface CustomXpGlobesConfig extends Config
         BLACKLIST // Never display XP globe
     }
 
-    @ConfigItem(keyName = "agilityDisplay", name = "Agility", description = "Display mode for Agility XP globe", position = 41, section = orbSection)
+    /* ---------------- Config Sections ---------------- */
+    @ConfigSection(
+            name = "Per Orb Loading",
+            description = "Set Each Orb To Normal / Forced / Blacklist",
+            position = 40,
+            closedByDefault = true
+    )
+    String orbMode = "orbMode";
+
+    @ConfigSection(
+            name = "Per Orb Priority",
+            description = "Set Priority Level For Each Orb",
+            position = 70,
+            closedByDefault = true
+    )
+    String orbPriority = "orbPriority";
+
+    /* ---------------- 1. Agility ---------------- */
+    @ConfigItem(keyName = "agilityDisplay", name = "Agility", description = "Agility Orb Display Settings", position = 41, section = orbMode)
     default SkillDisplayMode agilityDisplay() { return SkillDisplayMode.NORMAL; }
 
-    @ConfigItem(keyName = "attackDisplay", name = "Attack", description = "Display mode for Attack XP globe", position = 42, section = orbSection)
+    @ConfigItem(keyName = "agilityPriority", name = "Agility Priority", description = "Priority for Agility orb (1-23)", position = 42, section = orbPriority)
+    @Range(min = 1, max = 23)
+    default int agilityPriority() { return 10; }
+
+    /* ---------------- 2. Attack Skill Settings ---------------- */
+    @ConfigItem(keyName = "attackDisplay", name = "Attack", description = "Attack Orb Display Settings", position = 43, section = orbMode)
     default SkillDisplayMode attackDisplay() { return SkillDisplayMode.NORMAL; }
 
-    @ConfigItem(keyName = "constructionDisplay", name = "Construction", description = "Display mode for Construction XP globe", position = 43, section = orbSection)
+    @ConfigItem(keyName = "attackPriority", name = "Attack Priority", description = "Priority for Attack orb (1-23)", position = 44, section = orbPriority)
+    @Range(min = 1, max = 23)
+    default int attackPriority() { return 1; }
+
+    /* ---------------- 3. Construction Skill Settings ---------------- */
+    @ConfigItem(keyName = "constructionDisplay", name = "Construction", description = "Construction Orb Display Settings", position = 45, section = orbMode)
     default SkillDisplayMode constructionDisplay() { return SkillDisplayMode.NORMAL; }
 
-    @ConfigItem(keyName = "cookingDisplay", name = "Cooking", description = "Display mode for Cooking XP globe", position = 44, section = orbSection)
+    @ConfigItem(keyName = "constructionPriority", name = "Construction Priority", description = "Priority for Construction orb (1-23)", position = 46, section = orbPriority)
+    @Range(min = 1, max = 23)
+    default int constructionPriority() { return 8; }
+
+    /* ---------------- 4. Cooking Skill Settings ---------------- */
+    @ConfigItem(keyName = "cookingDisplay", name = "Cooking", description = "Cooking Orb Display Settings", position = 47, section = orbMode)
     default SkillDisplayMode cookingDisplay() { return SkillDisplayMode.NORMAL; }
 
-    @ConfigItem(keyName = "craftingDisplay", name = "Crafting", description = "Display mode for Crafting XP globe", position = 45, section = orbSection)
+    @ConfigItem(keyName = "cookingPriority", name = "Cooking Priority", description = "Priority for Cooking orb (1-23)", position = 48, section = orbPriority)
+    @Range(min = 1, max = 23)
+    default int cookingPriority() { return 20; }
+
+    /* ---------------- 5. Crafting Skill Settings ---------------- */
+    @ConfigItem(keyName = "craftingDisplay", name = "Crafting", description = "Crafting Orb Display Settings", position = 49, section = orbMode)
     default SkillDisplayMode craftingDisplay() { return SkillDisplayMode.NORMAL; }
 
-    @ConfigItem(keyName = "defenceDisplay", name = "Defense", description = "Display mode for Defense XP globe", position = 46, section = orbSection)
+    @ConfigItem(keyName = "craftingPriority", name = "Crafting Priority", description = "Priority for Crafting orb (1-23)", position = 50, section = orbPriority)
+    @Range(min = 1, max = 23)
+    default int craftingPriority() { return 13; }
+
+    /* ---------------- 6. Defence Skill Settings ---------------- */
+    @ConfigItem(keyName = "defenceDisplay", name = "Defence", description = "Defence Orb Display Settings", position = 51, section = orbMode)
     default SkillDisplayMode defenceDisplay() { return SkillDisplayMode.NORMAL; }
 
-    @ConfigItem(keyName = "farmingDisplay", name = "Farming", description = "Display mode for Farming XP globe", position = 47, section = orbSection)
+    @ConfigItem(keyName = "defencePriority", name = "Defence Priority", description = "Priority for Defence orb (1-23)", position = 52, section = orbPriority)
+    @Range(min = 1, max = 23)
+    default int defencePriority() { return 3; }
+
+    /* ---------------- 7. Farming Skill Settings ---------------- */
+    @ConfigItem(keyName = "farmingDisplay", name = "Farming", description = "Farming Orb Display Settings", position = 53, section = orbMode)
     default SkillDisplayMode farmingDisplay() { return SkillDisplayMode.NORMAL; }
 
-    @ConfigItem(keyName = "firemakingDisplay", name = "Firemaking", description = "Display mode for Firemaking XP globe", position = 48, section = orbSection)
+    @ConfigItem(keyName = "farmingPriority", name = "Farming Priority", description = "Priority for Farming orb (1-23)", position = 54, section = orbPriority)
+    @Range(min = 1, max = 23)
+    default int farmingPriority() { return 23; }
+
+    /* ---------------- 8. Firemaking Skill Settings ---------------- */
+    @ConfigItem(keyName = "firemakingDisplay", name = "Firemaking", description = "Firemaking Orb Display Settings", position = 55, section = orbMode)
     default SkillDisplayMode firemakingDisplay() { return SkillDisplayMode.NORMAL; }
 
-    @ConfigItem(keyName = "fletchingDisplay", name = "Fletching", description = "Display mode for Fletching XP globe", position = 49, section = orbSection)
+    @ConfigItem(keyName = "firemakingPriority", name = "Firemaking Priority", description = "Priority for Firemaking orb (1-23)", position = 56, section = orbPriority)
+    @Range(min = 1, max = 23)
+    default int firemakingPriority() { return 21; }
+
+    /* ---------------- 9. Fletching Skill Settings ---------------- */
+    @ConfigItem(keyName = "fletchingDisplay", name = "Fletching", description = "Fletching Orb Display Settings", position = 57, section = orbMode)
     default SkillDisplayMode fletchingDisplay() { return SkillDisplayMode.NORMAL; }
 
-    @ConfigItem(keyName = "fishingDisplay", name = "Fishing", description = "Display mode for Fishing XP globe", position = 50, section = orbSection)
+    @ConfigItem(keyName = "fletchingPriority", name = "Fletching Priority", description = "Priority for Fletching orb (1-23)", position = 58, section = orbPriority)
+    @Range(min = 1, max = 23)
+    default int fletchingPriority() { return 14; }
+
+    /* ---------------- 10. Fishing Skill Settings ---------------- */
+    @ConfigItem(keyName = "fishingDisplay", name = "Fishing", description = "Fishing Orb Display Settings", position = 59, section = orbMode)
     default SkillDisplayMode fishingDisplay() { return SkillDisplayMode.NORMAL; }
 
-    @ConfigItem(keyName = "herbloreDisplay", name = "Herblore", description = "Display mode for Herblore XP globe", position = 51, section = orbSection)
+    @ConfigItem(keyName = "fishingPriority", name = "Fishing Priority", description = "Priority for Fishing orb (1-23)", position = 60, section = orbPriority)
+    @Range(min = 1, max = 23)
+    default int fishingPriority() { return 19; }
+
+    /* ---------------- 11. Herblore Skill Settings ---------------- */
+    @ConfigItem(keyName = "herbloreDisplay", name = "Herblore", description = "Herblore Orb Display Settings", position = 61, section = orbMode)
     default SkillDisplayMode herbloreDisplay() { return SkillDisplayMode.NORMAL; }
 
-    @ConfigItem(keyName = "hitpointsDisplay", name = "Hitpoints", description = "Display mode for Hitpoints XP globe", position = 52, section = orbSection)
+    @ConfigItem(keyName = "herblorePriority", name = "Herblore Priority", description = "Priority for Herblore orb (1-23)", position = 62, section = orbPriority)
+    @Range(min = 1, max = 23)
+    default int herblorePriority() { return 11; }
+
+    /* ---------------- 12. Hitpoints Skill Settings ---------------- */
+    @ConfigItem(keyName = "hitpointsDisplay", name = "Hitpoints", description = "Hitpoints Orb Display Settings", position = 63, section = orbMode)
     default SkillDisplayMode hitpointsDisplay() { return SkillDisplayMode.NORMAL; }
 
-    @ConfigItem(keyName = "hunterDisplay", name = "Hunter", description = "Display mode for Hunter XP globe", position = 53, section = orbSection)
+    @ConfigItem(keyName = "hitpointsPriority", name = "Hitpoints Priority", description = "Priority for Hitpoints orb (1-23)", position = 64, section = orbPriority)
+    @Range(min = 1, max = 23)
+    default int hitpointsPriority() { return 9; }
+
+    /* ---------------- 13. Hunter Skill Settings ---------------- */
+    @ConfigItem(keyName = "hunterDisplay", name = "Hunter", description = "Hunter Orb Display Settings", position = 65, section = orbMode)
     default SkillDisplayMode hunterDisplay() { return SkillDisplayMode.NORMAL; }
 
-    @ConfigItem(keyName = "magicDisplay", name = "Magic", description = "Display mode for Magic XP globe", position = 54, section = orbSection)
+    @ConfigItem(keyName = "hunterPriority", name = "Hunter Priority", description = "Priority for Hunter orb (1-23)", position = 66, section = orbPriority)
+    @Range(min = 1, max = 23)
+    default int hunterPriority() { return 16; }
+
+    /* ---------------- 14. Magic Skill Settings ---------------- */
+    @ConfigItem(keyName = "magicDisplay", name = "Magic", description = "Magic Orb Display Settings", position = 67, section = orbMode)
     default SkillDisplayMode magicDisplay() { return SkillDisplayMode.NORMAL; }
 
-    @ConfigItem(keyName = "miningDisplay", name = "Mining", description = "Display mode for Mining XP globe", position = 55, section = orbSection)
+    @ConfigItem(keyName = "magicPriority", name = "Magic Priority", description = "Priority for Magic orb (1-23)", position = 68, section = orbPriority)
+    @Range(min = 1, max = 23)
+    default int magicPriority() { return 6; }
+
+    /* ---------------- 15. Mining Skill Settings ---------------- */
+    @ConfigItem(keyName = "miningDisplay", name = "Mining", description = "Mining Orb Display Settings", position = 69, section = orbMode)
     default SkillDisplayMode miningDisplay() { return SkillDisplayMode.NORMAL; }
 
-    @ConfigItem(keyName = "prayerDisplay", name = "Prayer", description = "Display mode for Prayer XP globe", position = 56, section = orbSection)
+    @ConfigItem(keyName = "miningPriority", name = "Mining Priority", description = "Priority for Mining orb (1-23)", position = 70, section = orbPriority)
+    @Range(min = 1, max = 23)
+    default int miningPriority() { return 17; }
+
+    /* ---------------- 16. Prayer Skill Settings ---------------- */
+    @ConfigItem(keyName = "prayerDisplay", name = "Prayer", description = "Prayer Orb Display Settings", position = 71, section = orbMode)
     default SkillDisplayMode prayerDisplay() { return SkillDisplayMode.NORMAL; }
 
-    @ConfigItem(keyName = "rangedDisplay", name = "Ranged", description = "Display mode for Ranged XP globe", position = 57, section = orbSection)
+    @ConfigItem(keyName = "prayerPriority", name = "Prayer Priority", description = "Priority for Prayer orb (1-23)", position = 72, section = orbPriority)
+    @Range(min = 1, max = 23)
+    default int prayerPriority() { return 5; }
+
+    /* ---------------- 17. Ranged Skill Settings ---------------- */
+    @ConfigItem(keyName = "rangedDisplay", name = "Ranged", description = "Ranged Orb Display Settings", position = 73, section = orbMode)
     default SkillDisplayMode rangedDisplay() { return SkillDisplayMode.NORMAL; }
 
-    @ConfigItem(keyName = "runecraftDisplay", name = "Runecraft", description = "Display mode for Runecraft XP globe", position = 58, section = orbSection)
+    @ConfigItem(keyName = "rangedPriority", name = "Ranged Priority", description = "Priority for Ranged orb (1-23)", position = 74, section = orbPriority)
+    @Range(min = 1, max = 23)
+    default int rangedPriority() { return 4; }
+
+    /* ---------------- 18. Runecraft Skill Settings ---------------- */
+    @ConfigItem(keyName = "runecraftDisplay", name = "Runecraft", description = "Runecraft Orb Display Settings", position = 75, section = orbMode)
     default SkillDisplayMode runecraftDisplay() { return SkillDisplayMode.NORMAL; }
 
-    @ConfigItem(keyName = "slayerDisplay", name = "Slayer", description = "Display mode for Slayer XP globe", position = 59, section = orbSection)
+    @ConfigItem(keyName = "runecraftPriority", name = "Runecraft Priority", description = "Priority for Runecraft orb (1-23)", position = 76, section = orbPriority)
+    @Range(min = 1, max = 23)
+    default int runecraftPriority() { return 7; }
+
+    /* ---------------- 19. Slayer Skill Settings ---------------- */
+    @ConfigItem(keyName = "slayerDisplay", name = "Slayer", description = "Slayer Orb Display Settings", position = 77, section = orbMode)
     default SkillDisplayMode slayerDisplay() { return SkillDisplayMode.NORMAL; }
 
-    @ConfigItem(keyName = "smithingDisplay", name = "Smithing", description = "Display mode for Smithing XP globe", position = 60, section = orbSection)
+    @ConfigItem(keyName = "slayerPriority", name = "Slayer Priority", description = "Priority for Slayer orb (1-23)", position = 78, section = orbPriority)
+    @Range(min = 1, max = 23)
+    default int slayerPriority() { return 15; }
+
+    /* ---------------- 20. Smithing Skill Settings ---------------- */
+    @ConfigItem(keyName = "smithingDisplay", name = "Smithing", description = "Smithing Orb Display Settings", position = 79, section = orbMode)
     default SkillDisplayMode smithingDisplay() { return SkillDisplayMode.NORMAL; }
 
-    @ConfigItem(keyName = "strengthDisplay", name = "Strength", description = "Display mode for Strength XP globe", position = 61, section = orbSection)
+    @ConfigItem(keyName = "smithingPriority", name = "Smithing Priority", description = "Priority for Smithing orb (1-23)", position = 80, section = orbPriority)
+    @Range(min = 1, max = 23)
+    default int smithingPriority() { return 18; }
+
+    /* ---------------- 21. Strength Skill Settings ---------------- */
+    @ConfigItem(keyName = "strengthDisplay", name = "Strength", description = "Strength Orb Display Settings", position = 81, section = orbMode)
     default SkillDisplayMode strengthDisplay() { return SkillDisplayMode.NORMAL; }
 
-    @ConfigItem(keyName = "thievingDisplay", name = "Thieving", description = "Display mode for Thieving XP globe", position = 62, section = orbSection)
+    @ConfigItem(keyName = "strengthPriority", name = "Strength Priority", description = "Priority for Strength orb (1-23)", position = 82, section = orbPriority)
+    @Range(min = 1, max = 23)
+    default int strengthPriority() { return 2; }
+
+    /* ---------------- 22. Thieving Skill Settings ---------------- */
+    @ConfigItem(keyName = "thievingDisplay", name = "Thieving", description = "Thieving Orb Display Settings", position = 83, section = orbMode)
     default SkillDisplayMode thievingDisplay() { return SkillDisplayMode.NORMAL; }
 
-    @ConfigItem(keyName = "woodcuttingDisplay", name = "Woodcutting", description = "Display mode for Woodcutting XP globe", position = 63, section = orbSection)
+    @ConfigItem(keyName = "thievingPriority", name = "Thieving Priority", description = "Priority for Thieving orb (1-23)", position = 84, section = orbPriority)
+    @Range(min = 1, max = 23)
+    default int thievingPriority() { return 12; }
+
+    /* ---------------- 23. Woodcutting Skill Settings ---------------- */
+    @ConfigItem(keyName = "woodcuttingDisplay", name = "Woodcutting", description = "Woodcutting Orb Display Settings", position = 85, section = orbMode)
     default SkillDisplayMode woodcuttingDisplay() { return SkillDisplayMode.NORMAL; }
 
-
+    @ConfigItem(keyName = "woodcuttingPriority", name = "Woodcutting Priority", description = "Priority for Woodcutting orb (1-23)", position = 86, section = orbPriority)
+    @Range(min = 1, max = 23)
+    default int woodcuttingPriority() { return 22; }
 }

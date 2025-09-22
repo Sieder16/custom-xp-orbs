@@ -1,12 +1,9 @@
-package net.runelite.client.plugins.customxpglobes;
+package net.runelite.client.plugins.customxporbs;
 
 import com.google.inject.Provides;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import javax.inject.Inject;
 import lombok.Getter;
 import net.runelite.api.*;
@@ -52,14 +49,14 @@ public class CustomXpGlobesPlugin extends Plugin
     @Inject
     private ConfigManager configManager;
 
-    @Inject
-    private Client client;
-
     @Provides
     CustomXpGlobesConfig provideConfig(ConfigManager configManager)
     {
         return configManager.getConfig(CustomXpGlobesConfig.class);
     }
+
+    @Inject
+    private Client client;
 
     @Override
     protected void startUp()
@@ -81,6 +78,40 @@ public class CustomXpGlobesPlugin extends Plugin
     {
         xpGlobes.clear();
         globeCache = new CustomXpGlobe[Skill.values().length];
+    }
+
+    /**
+     * Returns the user-selected priority for a given skill.
+     */
+    private int getSkillPriority(Skill skill)
+    {
+        switch (skill)
+        {
+            case ATTACK: return config.attackPriority();
+            case STRENGTH: return config.strengthPriority();
+            case DEFENCE: return config.defencePriority();
+            case RANGED: return config.rangedPriority();
+            case PRAYER: return config.prayerPriority();
+            case MAGIC: return config.magicPriority();
+            case RUNECRAFT: return config.runecraftPriority();
+            case CONSTRUCTION: return config.constructionPriority();
+            case HITPOINTS: return config.hitpointsPriority();
+            case AGILITY: return config.agilityPriority();
+            case HERBLORE: return config.herblorePriority();
+            case THIEVING: return config.thievingPriority();
+            case CRAFTING: return config.craftingPriority();
+            case FLETCHING: return config.fletchingPriority();
+            case SLAYER: return config.slayerPriority();
+            case HUNTER: return config.hunterPriority();
+            case MINING: return config.miningPriority();
+            case SMITHING: return config.smithingPriority();
+            case FISHING: return config.fishingPriority();
+            case COOKING: return config.cookingPriority();
+            case FIREMAKING: return config.firemakingPriority();
+            case WOODCUTTING: return config.woodcuttingPriority();
+            case FARMING: return config.farmingPriority();
+            default: return skill.ordinal(); // fallback
+        }
     }
 
     public enum SkillDisplayMode { NORMAL, FORCE, BLACKLIST }
@@ -214,9 +245,26 @@ public class CustomXpGlobesPlugin extends Plugin
 
     private void addXpGlobe(CustomXpGlobe globe, boolean ignoreMax)
     {
-        int idx = Collections.binarySearch(xpGlobes, globe, Comparator.comparing(CustomXpGlobe::getSkill));
-        if (idx < 0)
-            xpGlobes.add(-idx - 1, globe);
+        globe.setCachedPriority(getSkillPriority(globe.getSkill()));
+        xpGlobes.add(globe);
+
+        xpGlobes.sort((a, b) ->
+        {
+            SkillDisplayMode aMode = getSkillMode(a.getSkill());
+            SkillDisplayMode bMode = getSkillMode(b.getSkill());
+
+            // Forced orbs first
+            if (config.forceOrbs())
+            {
+                if (aMode == SkillDisplayMode.FORCE && bMode != SkillDisplayMode.FORCE) return -1;
+                if (aMode != SkillDisplayMode.FORCE && bMode == SkillDisplayMode.FORCE) return 1;
+            }
+
+            // Sort by cached priority normally
+            int cmp = Integer.compare(a.getCachedPriority(), b.getCachedPriority());
+            return cmp; // layout direction is handled later
+
+        });
 
         if (!ignoreMax && xpGlobes.stream().filter(g -> getSkillMode(g.getSkill()) != SkillDisplayMode.FORCE).count() > config.maximumShownGlobes())
         {
@@ -317,8 +365,24 @@ public class CustomXpGlobesPlugin extends Plugin
         if (!event.getGroup().equals("customxpglobes"))
             return;
 
-        // When a skill mode is changed to FORCE
+        // Refresh forced skills
         refreshForceSkills();
+
+        // Recalculate priorities and sort current orbs
+        xpGlobes.forEach(globe -> globe.setCachedPriority(getSkillPriority(globe.getSkill())));
+        xpGlobes.sort((a, b) ->
+        {
+            SkillDisplayMode aMode = getSkillMode(a.getSkill());
+            SkillDisplayMode bMode = getSkillMode(b.getSkill());
+
+            // Forced orbs first if enabled
+            if (config.forceOrbs())
+            {
+                if (aMode == SkillDisplayMode.FORCE && bMode != SkillDisplayMode.FORCE) return -1;
+                if (aMode != SkillDisplayMode.FORCE && bMode == SkillDisplayMode.FORCE) return 1;
+            }
+
+            return Integer.compare(a.getCachedPriority(), b.getCachedPriority());
+        });
     }
 }
-
