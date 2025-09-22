@@ -41,12 +41,11 @@ public class CustomXpGlobesOverlay extends Overlay
     private static final int PROGRESS_BACKGROUND_SIZE = 5;
     private static final int TOOLTIP_RECT_SIZE_X = 150;
     private static final Color DARK_OVERLAY_COLOR = new Color(0, 0, 0, 180);
-    private static final String FLIP_ACTION = "Flip";
     private static final double GLOBE_ICON_RATIO = 0.65;
 
     private final Client client;
-    private final CustomXpGlobesPlugin plugin;
-    private final CustomXpGlobesConfig config;
+    private final net.runelite.client.plugins.customxpglobes.CustomXpGlobesPlugin plugin;
+    private final net.runelite.client.plugins.customxpglobes.CustomXpGlobesConfig config;
     private final XpTrackerService xpTrackerService;
     private final TooltipManager tooltipManager;
     private final SkillIconManager iconManager;
@@ -69,7 +68,6 @@ public class CustomXpGlobesOverlay extends Overlay
         this.xpTrackerService = xpTrackerService;
         this.tooltipManager = tooltipManager;
         this.xpTooltip.getComponent().setPreferredSize(new Dimension(TOOLTIP_RECT_SIZE_X, 0));
-        // setPosition(OverlayPosition.TOP_CENTER);
     }
 
     @Override
@@ -102,25 +100,39 @@ public class CustomXpGlobesOverlay extends Overlay
         int maxX = 0;
         int maxY = 0;
 
-        boolean vertical = config.alignOrbsVertically(); // new flag
+        boolean vertical = config.alignOrbsVertically();
+
+        int totalLines = (xpGlobes.size() + maxPerLine - 1) / maxPerLine; // ceil division
+        int lastLineCount = xpGlobes.size() % maxPerLine;
+        if (lastLineCount == 0) lastLineCount = maxPerLine;
 
         for (int i = 0; i < xpGlobes.size(); i++)
         {
-            // Center last line/or column
-            int lineIndex = vertical ? i / maxPerLine : i / maxPerLine;
-            int lastLineCount = xpGlobes.size() % maxPerLine;
-            if (lastLineCount == 0) lastLineCount = maxPerLine;
+            int lineIndex = i / maxPerLine;
 
-            if (countInLine == 0 && lastLineCount < maxPerLine && lineIndex == (xpGlobes.size() / maxPerLine))
+            // Only align the last line if it's incomplete AND there is more than 1 line
+            if (countInLine == 0 && lineIndex == totalLines - 1 && lastLineCount < maxPerLine && totalLines > 1)
             {
+                int offset = (maxPerLine - lastLineCount) * step;
+
+                switch (config.lastLineAlignment())
+                {
+                    case CENTER:
+                        offset /= 2;
+                        break;
+                    case RIGHT:
+                        // full offset
+                        break;
+                    case LEFT:
+                    default:
+                        offset = 0;
+                        break;
+                }
+
                 if (vertical)
-                {
-                    curY += ((maxPerLine - lastLineCount) * step) / 2;
-                }
+                    curY += offset;
                 else
-                {
-                    curX += ((maxPerLine - lastLineCount) * step) / 2;
-                }
+                    curX += offset;
             }
 
             CustomXpGlobe xpGlobe = xpGlobes.get(i);
@@ -129,12 +141,12 @@ public class CustomXpGlobesOverlay extends Overlay
 
             renderProgressCircle(graphics, xpGlobe, startXp, goalXp, curX, curY, getBounds());
 
-            // Track overlay size
-            maxX = Math.max(maxX, curX);
-            maxY = Math.max(maxY, curY);
+            // Track overlay size (include orb edge)
+            maxX = Math.max(maxX, curX + orbSize);
+            maxY = Math.max(maxY, curY + orbSize);
 
-            countInLine++;
-            if (countInLine >= maxPerLine)
+            // Step logic
+            if (++countInLine >= maxPerLine)
             {
                 countInLine = 0;
                 if (vertical)
@@ -157,9 +169,8 @@ public class CustomXpGlobesOverlay extends Overlay
             }
         }
 
-        return new Dimension(maxX + orbSize + strokeOffset, maxY + orbSize + strokeOffset);
+        return new Dimension(maxX + strokeOffset, maxY + strokeOffset);
     }
-
 
 
     private double getSkillProgress(int startXp, int currentXp, int goalXp)

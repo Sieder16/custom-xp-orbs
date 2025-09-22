@@ -95,16 +95,45 @@ public interface CustomXpGlobesConfig extends Config
             section = onScreenOrbs
     )
     @Units(Units.SECONDS)
-    default int xpOrbDuration()
+    default int xpOrbDuration() { return 10; }
+
+    @ConfigItem(
+            keyName = "lastLineAlignment",
+            name = "Last Line Alignment",
+            description = "How to align the last row/column if it is not full",
+            position = 9,
+            section = onScreenOrbs
+    )
+    default LastLineAlignment lastLineAlignment()
     {
-        return 10;
+        return LastLineAlignment.CENTER; // default
+    }
+
+    enum LastLineAlignment
+    {
+        LEFT("Left / Top"),
+        CENTER("Center"),
+        RIGHT("Right / Bottom");
+
+        private final String displayName;
+
+        LastLineAlignment(String displayName)
+        {
+            this.displayName = displayName;
+        }
+
+        @Override
+        public String toString()
+        {
+            return displayName;
+        }
     }
 
     /* ---------------- Customize Orbs ---------------- */
     @ConfigSection(
             name = "Customize Orbs",
             description = "Settings for Customizing Orbs",
-            position = 9,
+            position = 12,
             closedByDefault = true
     )
     String customizeOrbs = "Customize Orbs";
@@ -113,7 +142,7 @@ public interface CustomXpGlobesConfig extends Config
             keyName = "enableCustomArcColor",
             name = "Enable custom arc color",
             description = "Enables the custom coloring of the globe's arc instead of using the skill's default color.",
-            position = 10,
+            position = 13,
             section = customizeOrbs
     )
     default boolean enableCustomArcColor() {
@@ -125,7 +154,7 @@ public interface CustomXpGlobesConfig extends Config
             keyName = "Progress arc color",
             name = "Progress arc color",
             description = "Change the color of the progress arc in the XP orb.",
-            position = 11,
+            position = 14,
             section = customizeOrbs
     )
     default Color progressArcColor() {
@@ -137,7 +166,7 @@ public interface CustomXpGlobesConfig extends Config
             keyName = "Progress orb outline color",
             name = "Progress orb outline color",
             description = "Change the color of the progress orb outline.",
-            position = 12,
+            position = 15,
             section = customizeOrbs
     )
     default Color progressOrbOutLineColor() {
@@ -149,7 +178,7 @@ public interface CustomXpGlobesConfig extends Config
             keyName = "Progress orb background color",
             name = "Progress orb background color",
             description = "Change the color of the progress orb background.",
-            position = 13,
+            position = 16,
             section = customizeOrbs
     )
     default Color progressOrbBackgroundColor() {
@@ -160,7 +189,7 @@ public interface CustomXpGlobesConfig extends Config
             keyName = "Progress arc width",
             name = "Progress arc width",
             description = "Change the stroke width of the progress arc.",
-            position = 14,
+            position = 17,
             section = customizeOrbs
     )
     @Units(Units.PIXELS)
@@ -172,7 +201,7 @@ public interface CustomXpGlobesConfig extends Config
             keyName = "Orb size",
             name = "Size of orbs",
             description = "Change the size of the XP orbs.",
-            position = 15,
+            position = 18,
             section = customizeOrbs
     )
     @Units(Units.PIXELS)
@@ -184,7 +213,7 @@ public interface CustomXpGlobesConfig extends Config
             keyName = "showSkillLevel",
             name = "Enable Level Display",
             description = "Show or hide the skill level inside XP orbs",
-            position = 16,
+            position = 19,
             section = customizeOrbs
     )
     default boolean showSkillLevel() {
@@ -195,7 +224,7 @@ public interface CustomXpGlobesConfig extends Config
             keyName = "useCustomLevelColor",
             name = "Custom Level Color",
             description = "If enabled, uses the configured level color; otherwise uses the skill color",
-            position = 17,
+            position = 20,
             section = customizeOrbs
     )
     default boolean useCustomLevelColor() {
@@ -207,7 +236,7 @@ public interface CustomXpGlobesConfig extends Config
             keyName = "levelArcColor",
             name = "Level arc color",
             description = "Color of the skill level text inside the orb",
-            position = 18,
+            position = 21,
             section = customizeOrbs
     )
     default Color levelArcColor() {
@@ -219,7 +248,7 @@ public interface CustomXpGlobesConfig extends Config
             keyName = "levelBorderColor",
             name = "Level border color",
             description = "Color of the border around the skill level text",
-            position = 19,
+            position = 22,
             section = customizeOrbs
     )
     default Color levelBorderColor() {
@@ -230,7 +259,7 @@ public interface CustomXpGlobesConfig extends Config
             keyName = "levelBorderWidth",
             name = "Level border width",
             description = "Width of the border around the skill level text",
-            position = 20,
+            position = 23,
             section = customizeOrbs
     )
     default int levelBorderWidth() {
@@ -242,7 +271,7 @@ public interface CustomXpGlobesConfig extends Config
             keyName = "iconVerticalOffset",
             name = "Icon Vertical Offset",
             description = "Move the skill icon up (positive) or down (negative) inside the orb (pixels).",
-            position = 21,
+            position = 24,
             section = customizeOrbs
     )
     default int iconVerticalOffset() {
@@ -254,7 +283,7 @@ public interface CustomXpGlobesConfig extends Config
             keyName = "levelVerticalOffset",
             name = "Level Vertical Offset",
             description = "Move the skill level text up (positive) or down (negative) inside the orb (pixels).",
-            position = 22,
+            position = 25,
             section = customizeOrbs
     )
     default int levelVerticalOffset() {
@@ -270,7 +299,7 @@ public interface CustomXpGlobesConfig extends Config
     )
     String orbTooltips = "Orb Tooltips";
 
-    public enum TooltipLine
+    enum TooltipLine
     {
         CURRENT_TOTAL_XP("Current Total XP"),
         XP_LEFT_FOR_LEVEL("XP Left For Level"),

@@ -4,6 +4,7 @@ import com.google.inject.Provides;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import lombok.Getter;
 import net.runelite.api.*;
@@ -248,35 +249,55 @@ public class CustomXpGlobesPlugin extends Plugin
         globe.setCachedPriority(getSkillPriority(globe.getSkill()));
         xpGlobes.add(globe);
 
+        // Sort orbs: forced first (if enabled), then by cached priority
         xpGlobes.sort((a, b) ->
         {
             SkillDisplayMode aMode = getSkillMode(a.getSkill());
             SkillDisplayMode bMode = getSkillMode(b.getSkill());
 
-            // Forced orbs first
             if (config.forceOrbs())
             {
                 if (aMode == SkillDisplayMode.FORCE && bMode != SkillDisplayMode.FORCE) return -1;
                 if (aMode != SkillDisplayMode.FORCE && bMode == SkillDisplayMode.FORCE) return 1;
             }
 
-            // Sort by cached priority normally
-            int cmp = Integer.compare(a.getCachedPriority(), b.getCachedPriority());
-            return cmp; // layout direction is handled later
-
+            return Integer.compare(a.getCachedPriority(), b.getCachedPriority());
         });
 
-        if (!ignoreMax && xpGlobes.stream().filter(g -> getSkillMode(g.getSkill()) != SkillDisplayMode.FORCE).count() > config.maximumShownGlobes())
+        if (!ignoreMax)
         {
-            xpGlobes.stream()
-                    .filter(g -> getSkillMode(g.getSkill()) != SkillDisplayMode.FORCE)
-                    .min(Comparator.comparing(CustomXpGlobe::getTime))
-                    .ifPresent(oldest -> {
-                        xpGlobes.remove(oldest);
-                        globeCache[oldest.getSkill().ordinal()] = null;
-                    });
+            enforceMaximumOrbs();
         }
     }
+
+    /**
+     * Ensures that the total number of normal orbs does not exceed the allowed maximum,
+     * taking into account the number of forced orbs.
+     */
+    private void enforceMaximumOrbs()
+    {
+        int forcedCount = (int) xpGlobes.stream()
+                .filter(g -> getSkillMode(g.getSkill()) == SkillDisplayMode.FORCE)
+                .count();
+
+        int maxNormal = Math.max(config.maximumShownGlobes() - forcedCount, 0);
+
+        // Collect normal orbs sorted oldest first
+        List<CustomXpGlobe> normalOrbs = xpGlobes.stream()
+                .filter(g -> getSkillMode(g.getSkill()) != SkillDisplayMode.FORCE)
+                .sorted(Comparator.comparing(CustomXpGlobe::getTime))
+                .collect(Collectors.toList());
+
+        // Remove oldest normal orbs until the count fits the limit
+        while (normalOrbs.size() > maxNormal)
+        {
+            CustomXpGlobe oldest = normalOrbs.remove(0);
+            xpGlobes.remove(oldest);
+            globeCache[oldest.getSkill().ordinal()] = null;
+        }
+    }
+
+
 
     @Schedule(period = 1, unit = ChronoUnit.SECONDS)
     public void removeExpiredXpGlobes()
@@ -384,6 +405,10 @@ public class CustomXpGlobesPlugin extends Plugin
 
             return Integer.compare(a.getCachedPriority(), b.getCachedPriority());
         });
+
+        // Enforce maximum shown orbs after config change
+        enforceMaximumOrbs();
     }
+
 }
 
