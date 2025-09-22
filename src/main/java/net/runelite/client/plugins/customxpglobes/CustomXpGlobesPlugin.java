@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.customxporbs;
+package net.runelite.client.plugins.customxpglobes;
 
 import com.google.inject.Provides;
 import java.time.Instant;
@@ -386,3 +386,4 @@ public class CustomXpGlobesPlugin extends Plugin
         });
     }
 }
+
