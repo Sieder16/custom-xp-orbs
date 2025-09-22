@@ -30,7 +30,7 @@ import net.runelite.client.ui.overlay.components.PanelComponent;
 import net.runelite.client.ui.overlay.tooltip.Tooltip;
 import net.runelite.client.ui.overlay.tooltip.TooltipManager;
 import net.runelite.client.util.ImageUtil;
-import net.runelite.client.plugins.customxporbs.CustomXpGlobesConfig.TooltipLine;
+import net.runelite.client.plugins.customxpglobes.CustomXpGlobesConfig.TooltipLine;
 
 
 public class CustomXpGlobesOverlay extends Overlay
@@ -453,4 +453,5 @@ public class CustomXpGlobesOverlay extends Overlay
         tooltipManager.add(this.xpTooltip);
     }
 }
+
 
