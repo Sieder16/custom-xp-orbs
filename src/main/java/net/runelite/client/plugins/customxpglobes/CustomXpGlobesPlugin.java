@@ -240,9 +240,8 @@ public class CustomXpGlobesPlugin extends Plugin
         // Recalculate priorities for all globes
         xpGlobes.forEach(globe -> globe.setCachedPriority(getSkillPriority(globe.getSkill())));
 
-        // Sort: forced orbs first, then by cached priority
-        xpGlobes.sort((a, b) ->
-        {
+        // Sort: if forceOrbs is enabled, forced orbs first, otherwise all together
+        xpGlobes.sort((a, b) -> {
             SkillDisplayMode aMode = getSkillMode(a.getSkill());
             SkillDisplayMode bMode = getSkillMode(b.getSkill());
 
@@ -252,12 +251,18 @@ public class CustomXpGlobesPlugin extends Plugin
                 if (aMode != SkillDisplayMode.FORCE && bMode == SkillDisplayMode.FORCE) return 1;
             }
 
-            return Integer.compare(a.getCachedPriority(), b.getCachedPriority());
+            // Compare by cached priority (ascending)
+            int cmp = Integer.compare(a.getCachedPriority(), b.getCachedPriority());
+            if (cmp != 0) return cmp;
+
+            // Tie-breaker: RuneScape skill order
+            return Integer.compare(a.getSkill().ordinal(), b.getSkill().ordinal());
         });
 
         // Enforce maximum shown orbs
         enforceMaximumOrbs();
     }
+
 
     private void addXpGlobe(CustomXpGlobe globe, boolean ignoreMax)
     {
@@ -372,6 +377,7 @@ public class CustomXpGlobesPlugin extends Plugin
                 addXpGlobe(globe, true); // ignoreMax = true for forced orbs
             }
         }
+        sortAndEnforceOrbs();
     }
 
 }

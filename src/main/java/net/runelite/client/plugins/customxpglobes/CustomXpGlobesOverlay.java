@@ -295,37 +295,42 @@ public class CustomXpGlobesOverlay extends Overlay
 
     private void drawSkillLevel(Graphics2D graphics, CustomXpGlobe xpGlobe, int x, int y)
     {
-        if (!config.showSkillLevel())
+        // If the Level Display is NONE, skip drawing
+        if (config.levelDisplayOption() == CustomXpGlobesConfig.LevelDisplayOption.NONE)
             return;
 
         final int orbSize = config.xpOrbSize();
         String skillLevel = String.valueOf(xpGlobe.getCurrentLevel());
 
-        int fontSize = Math.max(12, orbSize / 3);
-        graphics.setFont(new Font("Tahoma", Font.PLAIN, fontSize));
+        // Calculate font size based on orb size and config levelSize
+        int baseFontSize = Math.max(12, orbSize / 3);
+        int adjustedFontSize = baseFontSize + config.levelSize(); // levelSize allows user adjustment
+        graphics.setFont(new Font("Tahoma", Font.PLAIN, adjustedFontSize));
 
         FontMetrics fm = graphics.getFontMetrics();
         int textWidth = fm.stringWidth(skillLevel);
         int textHeight = fm.getHeight();
 
         int textX = x + (orbSize / 2) - (textWidth / 2);
-        int textY = y + (orbSize / 2) + (textHeight / 2) - 2 - config.levelVerticalOffset();  // apply offset
+        int textY = y + (orbSize / 2) + (textHeight / 2) - 2 - config.levelVerticalOffset();
 
-        Color fillColor = config.useCustomLevelColor() ? config.levelArcColor() : SkillColor.find(xpGlobe.getSkill()).getColor();
-        Color borderColor = config.levelBorderColor();
-        int borderWidth = config.levelBorderWidth();
+        // Choose text color
+        Color fillColor = config.levelDisplayOption() == CustomXpGlobesConfig.LevelDisplayOption.CUSTOM_COLOR
+                ? config.levelColor()
+                : SkillColor.find(xpGlobe.getSkill()).getColor();
 
-        // Draw outline
-        graphics.setColor(borderColor);
-        for (int dx = -borderWidth; dx <= borderWidth; dx++)
+        // Draw black border by offsetting around the text
+        graphics.setColor(Color.BLACK);
+        for (int dx = -1; dx <= 1; dx++)
         {
-            for (int dy = -borderWidth; dy <= borderWidth; dy++)
+            for (int dy = -1; dy <= 1; dy++)
             {
-                if (dx == 0 && dy == 0) continue;
+                if (dx == 0 && dy == 0) continue; // skip center
                 graphics.drawString(skillLevel, textX + dx, textY + dy);
             }
         }
 
+        // Draw the actual level text
         graphics.setColor(fillColor);
         graphics.drawString(skillLevel, textX, textY);
     }
@@ -363,46 +368,81 @@ public class CustomXpGlobesOverlay extends Overlay
         if (!config.enableTooltips())
             return;
 
-        // Reset the timer on the globe so it doesn't disappear while hovered
+        // Reset hover timer
         mouseOverSkill.setTime(Instant.now());
 
         DecimalFormat decimalFormat = new DecimalFormat("###,###,###");
         final PanelComponent xpTooltip = (PanelComponent) this.xpTooltip.getComponent();
         xpTooltip.getChildren().clear();
 
-        // Add the skill name and current level at the top
-        xpTooltip.getChildren().add(LineComponent.builder()
-                .left(mouseOverSkill.getSkill().getName())
-                .right(String.valueOf(mouseOverSkill.getCurrentLevel()))
-                .build());
-
-        // Collect tooltip lines from config
-        TooltipLine[] configuredLines = new TooltipLine[] {
-                config.tooltipLine1(),
-                config.tooltipLine2(),
-                config.tooltipLine3(),
-                config.tooltipLine4(),
-                config.tooltipLine5()
-        };
-
-        // Keep only unique lines, preserving order
-        List<TooltipLine> lines = new ArrayList<>();
-        for (TooltipLine line : configuredLines)
+        // Skill Name at top
+        Color skillNameColor;
+        switch (config.tooltipSkillNameOption())
         {
-            if (!lines.contains(line))
-                lines.add(line);
+            case MATCH_NAME_COLOR:
+                skillNameColor = SkillColor.find(mouseOverSkill.getSkill()).getColor();
+                break;
+            case CUSTOM_COLOR:
+                skillNameColor = config.tooltipSkillNameColor();
+                break;
+            default:
+                skillNameColor = Color.ORANGE; // Default color
         }
 
-        // Render tooltip lines based on selection
-        for (TooltipLine line : lines)
+        // Skill Level at top
+        Color skillLevelColor;
+        switch (config.tooltipSkillLevelOption())
         {
+            case MATCH_NAME_COLOR:
+                skillLevelColor = SkillColor.find(mouseOverSkill.getSkill()).getColor();
+                break;
+            case CUSTOM_COLOR:
+                skillLevelColor = config.tooltipSkillLevelColor();
+                break;
+            default:
+                skillLevelColor = Color.WHITE; // Default
+        }
+
+        xpTooltip.getChildren().add(LineComponent.builder()
+                .left(mouseOverSkill.getSkill().getName())
+                .leftColor(skillNameColor)
+                .right(String.valueOf(mouseOverSkill.getCurrentLevel()))
+                .rightColor(skillLevelColor)
+                .build());
+
+        // Collect configured lines
+        TooltipLine[] linesConfig = new TooltipLine[]
+                {
+                        config.tooltipLine1(),
+                        config.tooltipLine2(),
+                        config.tooltipLine3(),
+                        config.tooltipLine4(),
+                        config.tooltipLine5()
+                };
+
+        // Render tooltip lines dynamically
+        for (int i = 0; i < linesConfig.length; i++)
+        {
+            TooltipLine line = linesConfig[i];
+            if (line == TooltipLine.NONE)
+                continue;
+            if (line == TooltipLine.BLANK)
+            {
+                xpTooltip.getChildren().add(LineComponent.builder().left(" ").build());
+                continue;
+            }
+
+            Color lineColor = getTooltipLineColor(i + 1);
+            Color valueColor = getTooltipLineValueColor(i + 1);
+
             switch (line)
             {
                 case CURRENT_TOTAL_XP:
                     xpTooltip.getChildren().add(LineComponent.builder()
                             .left("Current Total XP:")
-                            .leftColor(Color.ORANGE)
+                            .leftColor(lineColor)
                             .right(decimalFormat.format(mouseOverSkill.getCurrentXp()))
+                            .rightColor(valueColor)
                             .build());
                     break;
 
@@ -412,8 +452,9 @@ public class CustomXpGlobesOverlay extends Overlay
                         int xpLeft = goalXp - mouseOverSkill.getCurrentXp();
                         xpTooltip.getChildren().add(LineComponent.builder()
                                 .left("XP Till Level:")
-                                .leftColor(Color.ORANGE)
+                                .leftColor(lineColor)
                                 .right(decimalFormat.format(xpLeft))
+                                .rightColor(valueColor)
                                 .build());
                     }
                     break;
@@ -426,8 +467,9 @@ public class CustomXpGlobesOverlay extends Overlay
                         {
                             xpTooltip.getChildren().add(LineComponent.builder()
                                     .left("Actions Left:")
-                                    .leftColor(Color.RED) // Red color
+                                    .leftColor(lineColor)
                                     .right(decimalFormat.format(actionsLeft))
+                                    .rightColor(valueColor)
                                     .build());
                         }
                     }
@@ -441,8 +483,9 @@ public class CustomXpGlobesOverlay extends Overlay
                         {
                             xpTooltip.getChildren().add(LineComponent.builder()
                                     .left("XP Per Hour:")
-                                    .leftColor(Color.ORANGE)
+                                    .leftColor(lineColor)
                                     .right(decimalFormat.format(xpHr))
+                                    .rightColor(valueColor)
                                     .build());
                         }
                     }
@@ -454,15 +497,55 @@ public class CustomXpGlobesOverlay extends Overlay
                         String timeLeft = xpTrackerService.getTimeTilGoal(mouseOverSkill.getSkill());
                         xpTooltip.getChildren().add(LineComponent.builder()
                                 .left("Time Till Level:")
-                                .leftColor(Color.ORANGE)
+                                .leftColor(lineColor)
                                 .right(timeLeft)
+                                .rightColor(valueColor)
                                 .build());
                     }
                     break;
             }
         }
+
         tooltipManager.add(this.xpTooltip);
     }
+
+    private Color getTooltipLineColor(int lineIndex)
+    {
+        if (!config.enableTooltipColors())
+        {
+            return Color.ORANGE; // default fallback when colors are disabled
+        }
+
+        switch (lineIndex)
+        {
+            case 1: return config.tooltipLine1Color();
+            case 2: return config.tooltipLine2Color();
+            case 3: return config.tooltipLine3Color();
+            case 4: return config.tooltipLine4Color();
+            case 5: return config.tooltipLine5Color();
+            default: return Color.ORANGE;
+        }
+    }
+
+    private Color getTooltipLineValueColor(int lineIndex)
+    {
+        if (!config.enableTooltipValueColors())
+        {
+            return Color.WHITE; // default fallback when value colors are disabled
+        }
+
+        switch (lineIndex)
+        {
+            case 1: return config.tooltipLine1ValueColor();
+            case 2: return config.tooltipLine2ValueColor();
+            case 3: return config.tooltipLine3ValueColor();
+            case 4: return config.tooltipLine4ValueColor();
+            case 5: return config.tooltipLine5ValueColor();
+            default: return Color.WHITE;
+        }
+    }
+
+
 }
 
 
