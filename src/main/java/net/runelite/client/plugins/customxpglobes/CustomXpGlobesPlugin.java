@@ -1,11 +1,12 @@
 package net.runelite.client.plugins.customxpglobes;
 
-import com.google.inject.Provides;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
+
+import com.google.inject.Provides;
 import lombok.Getter;
 import net.runelite.api.*;
 import net.runelite.api.events.GameStateChanged;
@@ -48,7 +49,7 @@ public class CustomXpGlobesPlugin extends Plugin
     private CustomXpGlobesOverlay overlay;
 
     @Inject
-    private ConfigManager configManager;
+    private Client client;
 
     @Provides
     CustomXpGlobesConfig provideConfig(ConfigManager configManager)
@@ -56,29 +57,19 @@ public class CustomXpGlobesPlugin extends Plugin
         return configManager.getConfig(CustomXpGlobesConfig.class);
     }
 
-    @Inject
-    private Client client;
-
     @Override
     protected void startUp()
     {
         overlayManager.add(overlay);
         xpGlobes.clear();
-        globeCache = new CustomXpGlobe[Skill.values().length];
-        loadForceSkillsAtStartup();
+        loadOrRefreshForcedSkills();
     }
 
     @Override
     protected void shutDown()
     {
         overlayManager.remove(overlay);
-        resetGlobes();
-    }
-
-    private void resetGlobes()
-    {
-        xpGlobes.clear();
-        globeCache = new CustomXpGlobe[Skill.values().length];
+        resetGlobeState();
     }
 
     /**
@@ -244,12 +235,12 @@ public class CustomXpGlobesPlugin extends Plugin
         }
     }
 
-    private void addXpGlobe(CustomXpGlobe globe, boolean ignoreMax)
+    private void sortAndEnforceOrbs()
     {
-        globe.setCachedPriority(getSkillPriority(globe.getSkill()));
-        xpGlobes.add(globe);
+        // Recalculate priorities for all globes
+        xpGlobes.forEach(globe -> globe.setCachedPriority(getSkillPriority(globe.getSkill())));
 
-        // Sort orbs: forced first (if enabled), then by cached priority
+        // Sort: forced orbs first, then by cached priority
         xpGlobes.sort((a, b) ->
         {
             SkillDisplayMode aMode = getSkillMode(a.getSkill());
@@ -264,10 +255,30 @@ public class CustomXpGlobesPlugin extends Plugin
             return Integer.compare(a.getCachedPriority(), b.getCachedPriority());
         });
 
+        // Enforce maximum shown orbs
+        enforceMaximumOrbs();
+    }
+
+    private void addXpGlobe(CustomXpGlobe globe, boolean ignoreMax)
+    {
+        globe.setCachedPriority(getSkillPriority(globe.getSkill()));
+        xpGlobes.add(globe);
+
         if (!ignoreMax)
         {
-            enforceMaximumOrbs();
+            sortAndEnforceOrbs();
         }
+    }
+
+    @Subscribe
+    public void onConfigChanged(ConfigChanged event)
+    {
+        if (!event.getGroup().equals("customxpglobes"))
+            return;
+
+        loadOrRefreshForcedSkills();
+
+        sortAndEnforceOrbs();
     }
 
     /**
@@ -288,7 +299,7 @@ public class CustomXpGlobesPlugin extends Plugin
                 .sorted(Comparator.comparing(CustomXpGlobe::getTime))
                 .collect(Collectors.toList());
 
-        // Remove oldest normal orbs until the count fits the limit
+        // Remove the oldest normal orbs until the count fits the limit
         while (normalOrbs.size() > maxNormal)
         {
             CustomXpGlobe oldest = normalOrbs.remove(0);
@@ -296,8 +307,6 @@ public class CustomXpGlobesPlugin extends Plugin
             globeCache[oldest.getSkill().ordinal()] = null;
         }
     }
-
-
 
     @Schedule(period = 1, unit = ChronoUnit.SECONDS)
     public void removeExpiredXpGlobes()
@@ -314,53 +323,39 @@ public class CustomXpGlobesPlugin extends Plugin
         });
     }
 
-    public void resetGlobeState()
+    private void resetGlobeState()
     {
         xpGlobes.clear();
         globeCache = new CustomXpGlobe[Skill.values().length];
+        firstMovementDetected = false; // reset movement detection
+        lastX = -1;
+        lastY = -1;
     }
+
 
     @Subscribe
     public void onGameStateChanged(GameStateChanged event)
     {
-        if (event.getGameState() == GameState.LOGGED_IN)
+        switch (event.getGameState())
         {
-            loadForceSkillsAtStartup();
-            boolean firstLogin = false;
-        }
-        else if (event.getGameState() == GameState.LOGIN_SCREEN ||
-                event.getGameState() == GameState.STARTING ||
-                event.getGameState() == GameState.CONNECTION_LOST)
-        {
-            resetGlobeState();
-        }
-    }
+            case LOGGED_IN:
+            case HOPPING:
+                resetGlobeState();
+                loadOrRefreshForcedSkills(); // forced orbs always loaded
+                break;
 
-    private void loadForceSkillsAtStartup()
-    {
+            case LOGIN_SCREEN:
+            case STARTING:
+            case CONNECTION_LOST:
+                resetGlobeState(); // clear everything, no orbs
+                break;
 
-        for (Skill skill : Skill.values())
-        {
-            SkillDisplayMode mode = getSkillMode(skill);
-
-            if (mode == SkillDisplayMode.FORCE)
-            {
-                int idx = skill.ordinal();
-                if (globeCache[idx] == null)
-                {
-                    int xp = client.getSkillExperience(skill);
-                    int level = client.getRealSkillLevel(skill);
-
-                    CustomXpGlobe globe = new CustomXpGlobe(skill, xp, level, Instant.now());
-                    globeCache[idx] = globe;
-                    addXpGlobe(globe, true);
-
-                }
-            }
+            default:
+                break;
         }
     }
 
-    private void refreshForceSkills()
+    private void loadOrRefreshForcedSkills()
     {
         for (Skill skill : Skill.values())
         {
@@ -374,40 +369,9 @@ public class CustomXpGlobesPlugin extends Plugin
 
                 CustomXpGlobe globe = new CustomXpGlobe(skill, xp, level, Instant.now());
                 globeCache[idx] = globe;
-                addXpGlobe(globe, true);
-
+                addXpGlobe(globe, true); // ignoreMax = true for forced orbs
             }
         }
-    }
-
-    @Subscribe
-    public void onConfigChanged(ConfigChanged event)
-    {
-        if (!event.getGroup().equals("customxpglobes"))
-            return;
-
-        // Refresh forced skills
-        refreshForceSkills();
-
-        // Recalculate priorities and sort current orbs
-        xpGlobes.forEach(globe -> globe.setCachedPriority(getSkillPriority(globe.getSkill())));
-        xpGlobes.sort((a, b) ->
-        {
-            SkillDisplayMode aMode = getSkillMode(a.getSkill());
-            SkillDisplayMode bMode = getSkillMode(b.getSkill());
-
-            // Forced orbs first if enabled
-            if (config.forceOrbs())
-            {
-                if (aMode == SkillDisplayMode.FORCE && bMode != SkillDisplayMode.FORCE) return -1;
-                if (aMode != SkillDisplayMode.FORCE && bMode == SkillDisplayMode.FORCE) return 1;
-            }
-
-            return Integer.compare(a.getCachedPriority(), b.getCachedPriority());
-        });
-
-        // Enforce maximum shown orbs after config change
-        enforceMaximumOrbs();
     }
 
 }
