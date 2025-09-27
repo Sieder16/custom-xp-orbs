@@ -343,16 +343,16 @@ public class CustomXpGlobesPlugin extends Plugin
     {
         switch (event.getGameState())
         {
-            case LOGGED_IN:
-            case HOPPING:
-                resetGlobeState();
-                loadOrRefreshForcedSkills(); // forced orbs always loaded
+            case LOADING:
+                // Reset movement tracking so normal XP globes wait until the player moves
+                firstMovementDetected = false;
+                lastX = -1;
+                lastY = -1;
                 break;
-
+                        
             case LOGIN_SCREEN:
-            case STARTING:
-            case CONNECTION_LOST:
-                resetGlobeState(); // clear everything, no orbs
+                resetGlobeState(); // clear any data on new session
+                loadOrRefreshForcedSkills(); // forced orbs always loaded
                 break;
 
             default:
@@ -381,4 +381,5 @@ public class CustomXpGlobesPlugin extends Plugin
     }
 
 }
+
 
