@@ -525,187 +525,195 @@ public interface CustomXpGlobesConfig extends Config
         BLACKLIST // Never display XP globe
     }
 
-    /* ---------------- 1. Agility ---------------- */
+        /* ---------------- 1. Agility ---------------- */
     @ConfigItem(keyName = "agilityDisplay", name = "Agility", description = "Agility Orb Display Settings", position = 61, section = orbMode)
     default SkillDisplayMode agilityDisplay() { return SkillDisplayMode.NORMAL; }
 
-    @ConfigItem(keyName = "agilityPriority", name = "Agility Priority", description = "Priority for Agility orb (1-23)", position = 62, section = orbPriority)
-    @Range(min = 1, max = 23)
+    @ConfigItem(keyName = "agilityPriority", name = "Agility Priority", description = "Priority for Agility orb (1-24)", position = 62, section = orbPriority)
+    @Range(min = 1, max = 24)
     default int agilityPriority() { return 10; }
 
     /* ---------------- 2. Attack Skill Settings ---------------- */
     @ConfigItem(keyName = "attackDisplay", name = "Attack", description = "Attack Orb Display Settings", position = 63, section = orbMode)
     default SkillDisplayMode attackDisplay() { return SkillDisplayMode.NORMAL; }
 
-    @ConfigItem(keyName = "attackPriority", name = "Attack Priority", description = "Priority for Attack orb (1-23)", position = 64, section = orbPriority)
-    @Range(min = 1, max = 23)
+    @ConfigItem(keyName = "attackPriority", name = "Attack Priority", description = "Priority for Attack orb (1-24)", position = 64, section = orbPriority)
+    @Range(min = 1, max = 24)
     default int attackPriority() { return 1; }
 
     /* ---------------- 3. Construction Skill Settings ---------------- */
     @ConfigItem(keyName = "constructionDisplay", name = "Construction", description = "Construction Orb Display Settings", position = 65, section = orbMode)
     default SkillDisplayMode constructionDisplay() { return SkillDisplayMode.NORMAL; }
 
-    @ConfigItem(keyName = "constructionPriority", name = "Construction Priority", description = "Priority for Construction orb (1-23)", position = 66, section = orbPriority)
-    @Range(min = 1, max = 23)
+    @ConfigItem(keyName = "constructionPriority", name = "Construction Priority", description = "Priority for Construction orb (1-24)", position = 66, section = orbPriority)
+    @Range(min = 1, max = 24)
     default int constructionPriority() { return 8; }
 
     /* ---------------- 4. Cooking Skill Settings ---------------- */
     @ConfigItem(keyName = "cookingDisplay", name = "Cooking", description = "Cooking Orb Display Settings", position = 67, section = orbMode)
     default SkillDisplayMode cookingDisplay() { return SkillDisplayMode.NORMAL; }
 
-    @ConfigItem(keyName = "cookingPriority", name = "Cooking Priority", description = "Priority for Cooking orb (1-23)", position = 68, section = orbPriority)
-    @Range(min = 1, max = 23)
+    @ConfigItem(keyName = "cookingPriority", name = "Cooking Priority", description = "Priority for Cooking orb (1-24)", position = 68, section = orbPriority)
+    @Range(min = 1, max = 24)
     default int cookingPriority() { return 20; }
 
     /* ---------------- 5. Crafting Skill Settings ---------------- */
     @ConfigItem(keyName = "craftingDisplay", name = "Crafting", description = "Crafting Orb Display Settings", position = 69, section = orbMode)
     default SkillDisplayMode craftingDisplay() { return SkillDisplayMode.NORMAL; }
 
-    @ConfigItem(keyName = "craftingPriority", name = "Crafting Priority", description = "Priority for Crafting orb (1-23)", position = 70, section = orbPriority)
-    @Range(min = 1, max = 23)
+    @ConfigItem(keyName = "craftingPriority", name = "Crafting Priority", description = "Priority for Crafting orb (1-24)", position = 70, section = orbPriority)
+    @Range(min = 1, max = 24)
     default int craftingPriority() { return 13; }
 
     /* ---------------- 6. Defence Skill Settings ---------------- */
     @ConfigItem(keyName = "defenceDisplay", name = "Defence", description = "Defence Orb Display Settings", position = 71, section = orbMode)
     default SkillDisplayMode defenceDisplay() { return SkillDisplayMode.NORMAL; }
 
-    @ConfigItem(keyName = "defencePriority", name = "Defence Priority", description = "Priority for Defence orb (1-23)", position = 72, section = orbPriority)
-    @Range(min = 1, max = 23)
+    @ConfigItem(keyName = "defencePriority", name = "Defence Priority", description = "Priority for Defence orb (1-24)", position = 72, section = orbPriority)
+    @Range(min = 1, max = 24)
     default int defencePriority() { return 3; }
 
     /* ---------------- 7. Farming Skill Settings ---------------- */
     @ConfigItem(keyName = "farmingDisplay", name = "Farming", description = "Farming Orb Display Settings", position = 73, section = orbMode)
     default SkillDisplayMode farmingDisplay() { return SkillDisplayMode.NORMAL; }
 
-    @ConfigItem(keyName = "farmingPriority", name = "Farming Priority", description = "Priority for Farming orb (1-23)", position = 74, section = orbPriority)
-    @Range(min = 1, max = 23)
+    @ConfigItem(keyName = "farmingPriority", name = "Farming Priority", description = "Priority for Farming orb (1-24)", position = 74, section = orbPriority)
+    @Range(min = 1, max = 24)
     default int farmingPriority() { return 23; }
 
     /* ---------------- 8. Firemaking Skill Settings ---------------- */
     @ConfigItem(keyName = "firemakingDisplay", name = "Firemaking", description = "Firemaking Orb Display Settings", position = 75, section = orbMode)
     default SkillDisplayMode firemakingDisplay() { return SkillDisplayMode.NORMAL; }
 
-    @ConfigItem(keyName = "firemakingPriority", name = "Firemaking Priority", description = "Priority for Firemaking orb (1-23)", position = 76, section = orbPriority)
-    @Range(min = 1, max = 23)
+    @ConfigItem(keyName = "firemakingPriority", name = "Firemaking Priority", description = "Priority for Firemaking orb (1-24)", position = 76, section = orbPriority)
+    @Range(min = 1, max = 24)
     default int firemakingPriority() { return 21; }
 
     /* ---------------- 9. Fletching Skill Settings ---------------- */
     @ConfigItem(keyName = "fletchingDisplay", name = "Fletching", description = "Fletching Orb Display Settings", position = 77, section = orbMode)
     default SkillDisplayMode fletchingDisplay() { return SkillDisplayMode.NORMAL; }
 
-    @ConfigItem(keyName = "fletchingPriority", name = "Fletching Priority", description = "Priority for Fletching orb (1-23)", position = 78, section = orbPriority)
-    @Range(min = 1, max = 23)
+    @ConfigItem(keyName = "fletchingPriority", name = "Fletching Priority", description = "Priority for Fletching orb (1-24)", position = 78, section = orbPriority)
+    @Range(min = 1, max = 24)
     default int fletchingPriority() { return 14; }
 
     /* ---------------- 10. Fishing Skill Settings ---------------- */
     @ConfigItem(keyName = "fishingDisplay", name = "Fishing", description = "Fishing Orb Display Settings", position = 79, section = orbMode)
     default SkillDisplayMode fishingDisplay() { return SkillDisplayMode.NORMAL; }
 
-    @ConfigItem(keyName = "fishingPriority", name = "Fishing Priority", description = "Priority for Fishing orb (1-23)", position = 80, section = orbPriority)
-    @Range(min = 1, max = 23)
+    @ConfigItem(keyName = "fishingPriority", name = "Fishing Priority", description = "Priority for Fishing orb (1-24)", position = 80, section = orbPriority)
+    @Range(min = 1, max = 24)
     default int fishingPriority() { return 19; }
 
     /* ---------------- 11. Herblore Skill Settings ---------------- */
     @ConfigItem(keyName = "herbloreDisplay", name = "Herblore", description = "Herblore Orb Display Settings", position = 81, section = orbMode)
     default SkillDisplayMode herbloreDisplay() { return SkillDisplayMode.NORMAL; }
 
-    @ConfigItem(keyName = "herblorePriority", name = "Herblore Priority", description = "Priority for Herblore orb (1-23)", position = 82, section = orbPriority)
-    @Range(min = 1, max = 23)
+    @ConfigItem(keyName = "herblorePriority", name = "Herblore Priority", description = "Priority for Herblore orb (1-24)", position = 82, section = orbPriority)
+    @Range(min = 1, max = 24)
     default int herblorePriority() { return 11; }
 
     /* ---------------- 12. Hitpoints Skill Settings ---------------- */
     @ConfigItem(keyName = "hitpointsDisplay", name = "Hitpoints", description = "Hitpoints Orb Display Settings", position = 83, section = orbMode)
     default SkillDisplayMode hitpointsDisplay() { return SkillDisplayMode.NORMAL; }
 
-    @ConfigItem(keyName = "hitpointsPriority", name = "Hitpoints Priority", description = "Priority for Hitpoints orb (1-23)", position = 84, section = orbPriority)
-    @Range(min = 1, max = 23)
+    @ConfigItem(keyName = "hitpointsPriority", name = "Hitpoints Priority", description = "Priority for Hitpoints orb (1-24)", position = 84, section = orbPriority)
+    @Range(min = 1, max = 24)
     default int hitpointsPriority() { return 9; }
 
     /* ---------------- 13. Hunter Skill Settings ---------------- */
     @ConfigItem(keyName = "hunterDisplay", name = "Hunter", description = "Hunter Orb Display Settings", position = 85, section = orbMode)
     default SkillDisplayMode hunterDisplay() { return SkillDisplayMode.NORMAL; }
 
-    @ConfigItem(keyName = "hunterPriority", name = "Hunter Priority", description = "Priority for Hunter orb (1-23)", position = 86, section = orbPriority)
-    @Range(min = 1, max = 23)
+    @ConfigItem(keyName = "hunterPriority", name = "Hunter Priority", description = "Priority for Hunter orb (1-24)", position = 86, section = orbPriority)
+    @Range(min = 1, max = 24)
     default int hunterPriority() { return 16; }
 
     /* ---------------- 14. Magic Skill Settings ---------------- */
     @ConfigItem(keyName = "magicDisplay", name = "Magic", description = "Magic Orb Display Settings", position = 87, section = orbMode)
     default SkillDisplayMode magicDisplay() { return SkillDisplayMode.NORMAL; }
 
-    @ConfigItem(keyName = "magicPriority", name = "Magic Priority", description = "Priority for Magic orb (1-23)", position = 88, section = orbPriority)
-    @Range(min = 1, max = 23)
+    @ConfigItem(keyName = "magicPriority", name = "Magic Priority", description = "Priority for Magic orb (1-24)", position = 88, section = orbPriority)
+    @Range(min = 1, max = 24)
     default int magicPriority() { return 6; }
 
     /* ---------------- 15. Mining Skill Settings ---------------- */
     @ConfigItem(keyName = "miningDisplay", name = "Mining", description = "Mining Orb Display Settings", position = 89, section = orbMode)
     default SkillDisplayMode miningDisplay() { return SkillDisplayMode.NORMAL; }
 
-    @ConfigItem(keyName = "miningPriority", name = "Mining Priority", description = "Priority for Mining orb (1-23)", position = 90, section = orbPriority)
-    @Range(min = 1, max = 23)
+    @ConfigItem(keyName = "miningPriority", name = "Mining Priority", description = "Priority for Mining orb (1-24)", position = 90, section = orbPriority)
+    @Range(min = 1, max = 24)
     default int miningPriority() { return 17; }
 
     /* ---------------- 16. Prayer Skill Settings ---------------- */
     @ConfigItem(keyName = "prayerDisplay", name = "Prayer", description = "Prayer Orb Display Settings", position = 91, section = orbMode)
     default SkillDisplayMode prayerDisplay() { return SkillDisplayMode.NORMAL; }
 
-    @ConfigItem(keyName = "prayerPriority", name = "Prayer Priority", description = "Priority for Prayer orb (1-23)", position = 92, section = orbPriority)
-    @Range(min = 1, max = 23)
+    @ConfigItem(keyName = "prayerPriority", name = "Prayer Priority", description = "Priority for Prayer orb (1-24)", position = 92, section = orbPriority)
+    @Range(min = 1, max = 24)
     default int prayerPriority() { return 5; }
 
     /* ---------------- 17. Ranged Skill Settings ---------------- */
     @ConfigItem(keyName = "rangedDisplay", name = "Ranged", description = "Ranged Orb Display Settings", position = 93, section = orbMode)
     default SkillDisplayMode rangedDisplay() { return SkillDisplayMode.NORMAL; }
 
-    @ConfigItem(keyName = "rangedPriority", name = "Ranged Priority", description = "Priority for Ranged orb (1-23)", position = 94, section = orbPriority)
-    @Range(min = 1, max = 23)
+    @ConfigItem(keyName = "rangedPriority", name = "Ranged Priority", description = "Priority for Ranged orb (1-24)", position = 94, section = orbPriority)
+    @Range(min = 1, max = 24)
     default int rangedPriority() { return 4; }
 
     /* ---------------- 18. Runecraft Skill Settings ---------------- */
     @ConfigItem(keyName = "runecraftDisplay", name = "Runecraft", description = "Runecraft Orb Display Settings", position = 95, section = orbMode)
     default SkillDisplayMode runecraftDisplay() { return SkillDisplayMode.NORMAL; }
 
-    @ConfigItem(keyName = "runecraftPriority", name = "Runecraft Priority", description = "Priority for Runecraft orb (1-23)", position = 96, section = orbPriority)
-    @Range(min = 1, max = 23)
+    @ConfigItem(keyName = "runecraftPriority", name = "Runecraft Priority", description = "Priority for Runecraft orb (1-24)", position = 96, section = orbPriority)
+    @Range(min = 1, max = 24)
     default int runecraftPriority() { return 7; }
 
     /* ---------------- 19. Slayer Skill Settings ---------------- */
     @ConfigItem(keyName = "slayerDisplay", name = "Slayer", description = "Slayer Orb Display Settings", position = 97, section = orbMode)
     default SkillDisplayMode slayerDisplay() { return SkillDisplayMode.NORMAL; }
 
-    @ConfigItem(keyName = "slayerPriority", name = "Slayer Priority", description = "Priority for Slayer orb (1-23)", position = 98, section = orbPriority)
-    @Range(min = 1, max = 23)
+    @ConfigItem(keyName = "slayerPriority", name = "Slayer Priority", description = "Priority for Slayer orb (1-24)", position = 98, section = orbPriority)
+    @Range(min = 1, max = 24)
     default int slayerPriority() { return 15; }
 
     /* ---------------- 20. Smithing Skill Settings ---------------- */
     @ConfigItem(keyName = "smithingDisplay", name = "Smithing", description = "Smithing Orb Display Settings", position = 99, section = orbMode)
     default SkillDisplayMode smithingDisplay() { return SkillDisplayMode.NORMAL; }
 
-    @ConfigItem(keyName = "smithingPriority", name = "Smithing Priority", description = "Priority for Smithing orb (1-23)", position = 100, section = orbPriority)
-    @Range(min = 1, max = 23)
+    @ConfigItem(keyName = "smithingPriority", name = "Smithing Priority", description = "Priority for Smithing orb (1-24)", position = 100, section = orbPriority)
+    @Range(min = 1, max = 24)
     default int smithingPriority() { return 18; }
 
     /* ---------------- 21. Strength Skill Settings ---------------- */
     @ConfigItem(keyName = "strengthDisplay", name = "Strength", description = "Strength Orb Display Settings", position = 101, section = orbMode)
     default SkillDisplayMode strengthDisplay() { return SkillDisplayMode.NORMAL; }
 
-    @ConfigItem(keyName = "strengthPriority", name = "Strength Priority", description = "Priority for Strength orb (1-23)", position = 102, section = orbPriority)
-    @Range(min = 1, max = 23)
+    @ConfigItem(keyName = "strengthPriority", name = "Strength Priority", description = "Priority for Strength orb (1-24)", position = 102, section = orbPriority)
+    @Range(min = 1, max = 24)
     default int strengthPriority() { return 2; }
 
     /* ---------------- 22. Thieving Skill Settings ---------------- */
     @ConfigItem(keyName = "thievingDisplay", name = "Thieving", description = "Thieving Orb Display Settings", position = 103, section = orbMode)
     default SkillDisplayMode thievingDisplay() { return SkillDisplayMode.NORMAL; }
 
-    @ConfigItem(keyName = "thievingPriority", name = "Thieving Priority", description = "Priority for Thieving orb (1-23)", position = 104, section = orbPriority)
-    @Range(min = 1, max = 23)
+    @ConfigItem(keyName = "thievingPriority", name = "Thieving Priority", description = "Priority for Thieving orb (1-24)", position = 104, section = orbPriority)
+    @Range(min = 1, max = 24)
     default int thievingPriority() { return 12; }
 
     /* ---------------- 23. Woodcutting Skill Settings ---------------- */
     @ConfigItem(keyName = "woodcuttingDisplay", name = "Woodcutting", description = "Woodcutting Orb Display Settings", position = 105, section = orbMode)
     default SkillDisplayMode woodcuttingDisplay() { return SkillDisplayMode.NORMAL; }
 
-    @ConfigItem(keyName = "woodcuttingPriority", name = "Woodcutting Priority", description = "Priority for Woodcutting orb (1-23)", position = 106, section = orbPriority)
-    @Range(min = 1, max = 23)
+    @ConfigItem(keyName = "woodcuttingPriority", name = "Woodcutting Priority", description = "Priority for Woodcutting orb (1-24)", position = 106, section = orbPriority)
+    @Range(min = 1, max = 24)
     default int woodcuttingPriority() { return 22; }
+
+    /* ---------------- 24. Sailing Skill Settings ---------------- */
+	@ConfigItem(keyName = "sailingDisplay", name = "Sailing", description = "SAiling Orb Display Settings", position = 107, section = orbMode)
+	default SkillDisplayMode sailingDisplay() { return SkillDisplayMode.NORMAL; }
+
+	@ConfigItem(keyName = "sailingPriority", name = "Sailing Priority", description = "Priority for Sailing orb (1-24)", position = 108, section = orbPriority)
+	@Range(min = 1, max = 24)
+	default int sailingPriority() { return 24; }
 }
